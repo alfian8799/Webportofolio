@@ -1,0 +1,38 @@
+export const certificatesData = [
+  {
+    id: 1,
+    title: "Alih Profesi ke UI/UX",
+    issuer: "Geeksfarm",
+    date: "2024",
+    badge: "/certs/geeksfarm.png",
+    image: "https://placehold.co/600x400/18181b/ffffff?text=Geeksfarm",
+    credentialUrl: "#",
+  },
+  {
+    id: 2,
+    title: "UI UX Figma",
+    issuer: "Aksademy",
+    date: "2025",
+    badge: "/certs/aksademy.png",
+    image: "https://placehold.co/600x400/18181b/ffffff?text=Aksademy",
+    credentialUrl: "#",
+  },
+  {
+    id: 3,
+    title: "Figma 2024: Beginner to Pro Class",
+    issuer: "Skillshare",
+    date: "2025",
+    badge: "/certs/skillshare.png",
+    image: "https://placehold.co/600x400/18181b/ffffff?text=Skillshare",
+    credentialUrl: "#",
+  },
+  {
+    id: 4,
+    title: "AWS Certified Cloud Practitioner",
+    issuer: "Amazon Web Services",
+    date: "2024",
+    badge: "/certs/aws.png",
+    image: "https://placehold.co/600x400/18181b/ffffff?text=AWS",
+    credentialUrl: "#",
+  },
+];

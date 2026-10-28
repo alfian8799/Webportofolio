@@ -4,6 +4,7 @@ import { Hero } from '../components/Hero';
 import { FeaturedProjects } from '../components/FeaturedProjects';
 import { Services } from '../components/Services';
 import { FAQ } from '../components/FAQ';
+import { CertificationMarquee } from '../components/CertificationMarquee';
 
 export const MainLayout = ({ children }) => {
   return (
@@ -17,6 +18,7 @@ export const MainLayout = ({ children }) => {
             <Hero />
             <Services />
             <FeaturedProjects />
+            <CertificationMarquee />
             <FAQ />
           </>
         )}

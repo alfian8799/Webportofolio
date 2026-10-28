@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 export const Footer = () => {
   const { lang } = useLanguage();
   return (
-    <footer id="contact" className="bg-[#ff4a22] text-white pt-24 pb-12 px-6 rounded-t-[3rem] md:rounded-t-[4rem] mt-12 border-t border-white/10">
+    <footer id="contact" className="bg-[#ff4a22] text-white pt-24 pb-0 px-6 rounded-t-[3rem] md:rounded-t-[4rem] mt-12 border-t border-white/10 overflow-hidden">
       <div className="max-w-350 mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
           <div>
@@ -53,8 +53,9 @@ export const Footer = () => {
           <p className="mt-4 md:mt-0">{lang === 'en' ? 'Based in Indonesia' : 'Berbasis di Indonesia'}</p>
         </div>
 
-        <div className="mt-16 overflow-hidden select-none pointer-events-none">
-          <h1 className="text-[clamp(3.5rem,14vw,15rem)] font-black leading-none tracking-tighter text-white/20 text-center uppercase whitespace-nowrap">
+        {/* Big Typography with adjusted spacing */}
+        <div className="mt-8 md:mt-12 overflow-hidden select-none pointer-events-none flex justify-center items-end">
+          <h1 className="text-[clamp(3.5rem,14vw,15rem)] font-black leading-[0.85] tracking-tighter text-white/20 text-center uppercase whitespace-nowrap -mb-1 md:-mb-1 translate-y-2">
             Alfian.Z
           </h1>
         </div>

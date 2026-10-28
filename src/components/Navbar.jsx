@@ -13,7 +13,7 @@ export const Navbar = () => {
   const navLinks = [
     { name: lang === "en" ? "Home" : "Beranda", path: "/" },
     { name: lang === "en" ? "Project" : "Proyek", path: "/projects" },
-    { name: "About", path: "/about" },
+    { name: lang === "en" ? "About" : "Tentang", path: "/about" },
     { name: lang === "en" ? "Contact" : "Kontak", path: "/contact" },
   ];
 

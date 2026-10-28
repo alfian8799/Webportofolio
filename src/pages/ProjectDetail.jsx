@@ -1,15 +1,32 @@
-﻿import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, ArrowLeft, CheckCircle2, Wrench, Layers } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowLeft,
+  CheckCircle2,
+  Wrench,
+  Layers,
+  ExternalLink,
+
+} from "lucide-react";
 import { FadeIn } from "../components/FadeIn";
-import { useLanguage } from "../context/LanguageContext";
+import { ProjectImageLightbox } from "../components/ProjectImageLightbox";
+import { UXCaseStudy } from "../components/UXCaseStudy";
+import { useLanguage, t } from "../context/LanguageContext";
 import { projectsData } from "../data/projectsData";
 
 const ProjectDetail = () => {
   const { slug } = useParams();
   const { lang } = useLanguage();
   const sectionRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const openImageViewer = useCallback((image) => {
+    setSelectedImage(image);
+  }, []);
+  const closeImageViewer = useCallback(() => {
+    setSelectedImage(null);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -18,6 +35,20 @@ const ProjectDetail = () => {
   const lineWidth = useTransform(scrollYProgress, [0, 0.4], ["0%", "100%"]);
 
   const project = projectsData[slug];
+
+  // Helper Fallback Gambar Rusak / Tidak Ditemukan
+  const handleImageError = (e) => {
+    e.currentTarget.onerror = null;
+    e.currentTarget.src =
+      "https://placehold.co/1200x675/18181b/faf9f6?text=Image+Not+Found";
+  };
+
+  // Helper Ambil Teks Sesuai Bahasa (en/id)
+  const getLocalizedText = (field) => {
+    if (!field) return "";
+    if (typeof field === "string") return field;
+    return field[lang] || field["id"] || field["en"] || "";
+  };
 
   if (!project) {
     return (
@@ -38,9 +69,18 @@ const ProjectDetail = () => {
     );
   }
 
+  // Scope of Work List berdasarkan bahasa
+  const scopeList = Array.isArray(project.scopeOfWork)
+    ? project.scopeOfWork
+    : project.scopeOfWork?.[lang] || project.scopeOfWork?.["id"] || [];
+
+  // Ambil 2 proyek lain untuk rekomendasi
   const otherProjects = Object.entries(projectsData)
-    .filter(([key]) => key !== slug)
-    .slice(0, 2);
+    .filter(
+      ([key, item]) =>
+        key !== slug && (!project?.uxCaseStudy || item.uxCaseStudy),
+    )
+    .slice(0, project?.uxCaseStudy ? 1 : 2);
 
   return (
     <section
@@ -62,145 +102,206 @@ const ProjectDetail = () => {
         {/* 1. Hero Header */}
         <div className="mb-10">
           <FadeIn>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight dark:text-white mb-4">
+              {project.title}
+            </h1>
+            {project.subtitle && (
+              <p className="text-lg md:text-xl text-zinc-500 dark:text-zinc-400 font-light mb-4">
+                {project.subtitle}
+              </p>
+            )}
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] bg-[#ff4a22]/10 px-3 py-1 rounded-full font-bold">
                 {project.role}
               </span>
+              <span className="text-xs font-mono text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-3 py-1 rounded-full">
+                {project.year}
+              </span>
+              {project.category && (
+                <span className="text-xs font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-200/60 dark:bg-zinc-800/60 px-3 py-1 rounded-full">
+                  {project.category}
+                </span>
+              )}
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight dark:text-white mb-6">
-              {project.title}
-            </h1>
           </FadeIn>
         </div>
 
-        {/* 2. Banner Utama */}
+        {/* 2. Banner Utama (Hero Image - Dinamis) */}
         <FadeIn delay={0.1}>
-          <div className="w-full aspect-[16/9] md:aspect-[21/9] bg-gradient-to-b from-zinc-200/50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950 rounded-3xl overflow-hidden relative border border-zinc-200 dark:border-zinc-800/80 shadow-2xl mb-16 group">
+          <button
+            type="button"
+            onClick={() =>
+              openImageViewer({
+                src: project.image || "/images/placeholder.webp",
+                alt: project.title,
+              })
+            }
+            aria-label={
+              lang === "en"
+                ? `View ${project.title} image`
+                : `Lihat gambar ${project.title}`
+            }
+            className="group relative mb-16 block aspect-[16/9] w-full cursor-zoom-in overflow-hidden rounded-2xl text-left md:aspect-[21/9]"
+          >
             <img
-              src={project.image}
+              src={project.image || "/images/placeholder.webp"}
               alt={project.title}
+              onError={handleImageError}
               className="w-full h-full object-cover object-center group-hover:scale-[1.02] transition-transform duration-700 ease-out"
             />
-          </div>
+          </button>
         </FadeIn>
 
-        {/* 3. Tataletak Utama: Sticky Sidebar + Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 mb-24">
-          
-          {/* Kiri: Sticky Sidebar */}
-          <aside className="lg:col-span-4 space-y-8 lg:sticky lg:top-24 h-fit">
-            <FadeIn>
-              <div className="p-6 md:p-8 rounded-2xl bg-white dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 shadow-sm space-y-8">
-                
-                {/* Tools & Tech Stack */}
-                <div>
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold mb-3 flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-[#ff4a22]" />
-                    {lang === "en" ? "Tools & Stack" : "Alat & Teknologi"}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {project.stack?.map((s) => (
-                      <span
-                        key={s}
-                        className="text-xs font-mono uppercase tracking-wider text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/50 px-3 py-1 rounded-md"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="h-px bg-zinc-200 dark:bg-zinc-800" />
-
-                {/* Scope of Work / Responsibilities */}
-                <div>
-                  <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold mb-4 flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#ff4a22]" />
-                    {lang === "en" ? "Key Responsibilities" : "Tanggung Jawab"}
-                  </h3>
-                  <ul className="space-y-3">
-                    {(project.scopeOfWork?.[lang] || project.scopeOfWork?.["id"] || project.scopeOfWork || []).map((item, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-600 dark:text-zinc-300 leading-snug">
-                        <CheckCircle2 className="w-4 h-4 text-[#ff4a22] shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
+        {project.uxCaseStudy ? (
+          <UXCaseStudy project={project} onImageClick={openImageViewer} />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-16 mb-24">
+              <div className="space-y-10">
+                <FadeIn>
+                  <section className="space-y-5">
+                    <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
+                      {lang === "en" ? "Project Description" : "Deskripsi"}
+                    </h2>
+                    <p className="text-zinc-700 dark:text-zinc-200 leading-relaxed text-lg">
+                      {getLocalizedText(project.overview)}
+                    </p>
+                    {project.overviewDetail && (
+                      <p className="text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        {getLocalizedText(project.overviewDetail)}
+                      </p>
+                    )}
+                  </section>
+                </FadeIn>
+                {project.outcome && (
+                  <FadeIn>
+                    <section className="space-y-4 border-t border-zinc-200/70 pt-7 dark:border-zinc-800/70">
+                      <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
+                        {lang === "en" ? "Results" : "Hasil"}
+                      </h2>
+                      <p className="text-zinc-700 dark:text-zinc-200 leading-relaxed text-lg">
+                        {getLocalizedText(project.outcome)}
+                      </p>
+                    </section>
+                  </FadeIn>
+                )}
               </div>
-            </FadeIn>
-          </aside>
 
-          {/* Kanan: Content Flow */}
-          <main className="lg:col-span-8 space-y-12">
-            
-            {/* 01. Overview */}
-            <FadeIn>
-              <section className="space-y-3">
-                <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
-                {lang === "en" ? "Overview" : "Ringkasan"}
-                </h2>
-                <h3 className="text-2xl md:text-3xl font-bold dark:text-white">
-                  {lang === "en" ? "Project Overview" : "Ringkasan Proyek"}
-                </h3>
-                <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed text-base md:text-lg">
-                  {project.overview?.[lang] || project.overview?.["id"] || project.overview}
-                </p>
-              </section>
-            </FadeIn>
+              <div className="space-y-10 lg:border-l lg:border-zinc-200/70 lg:dark:border-zinc-800/70 lg:pl-10">
+                {scopeList.length > 0 && (
+                  <FadeIn>
+                    <section className="space-y-5">
+                      <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold flex items-center gap-2">
+                        <Layers className="w-4 h-4" />
+                        {t("projectDetail", "responsibilities", lang) || "Key Responsibilities"}
+                      </h2>
+                      <ul className="flex flex-col gap-4">
+                        {scopeList.map((item, i) => (
+                          <li
+                            key={i}
+                            className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed"
+                          >
+                            <CheckCircle2 className="w-4 h-4 text-[#ff4a22] shrink-0 mt-0.5" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  </FadeIn>
+                )}
 
-            {/* 02. Final Outcome */}
-            <FadeIn>
-              <section className="space-y-3 pt-6 border-t border-zinc-200/60 dark:border-zinc-800/60">
-                <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
-                {lang === "en" ? "Results" : "Hasil Akhir"}
-                </h2>
-                <h3 className="text-2xl md:text-3xl font-bold dark:text-white">
-                  {lang === "en" ? "Final Outcome" : "Hasil Akhir"}
-                </h3>
-                <div className="p-6 rounded-2xl bg-zinc-100/80 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80">
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                    {project.outcome?.[lang] || project.outcome?.["id"] || project.outcome}
-                  </p>
-                </div>
-              </section>
-            </FadeIn>
+                {project.stack && project.stack.length > 0 && (
+                  <FadeIn>
+                    <section className="space-y-5 border-t border-zinc-200/70 dark:border-zinc-800/70 pt-7">
+                      <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold flex items-center gap-2">
+                        <Wrench className="w-4 h-4" />
+                        {lang === "en" ? "Software & Tools" : "Software & Tools"}
+                      </h2>
+                      <ul className="flex flex-wrap gap-x-5 gap-y-3">
+                        {project.stack.map((tool) => (
+                          <li
+                            key={tool}
+                            className="text-sm text-zinc-700 dark:text-zinc-300"
+                          >
+                            {tool}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="flex flex-wrap items-center gap-4 pt-2">
+                        {project.demo && project.demo !== "#" && (
+                          <a
+                            href={project.demo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group inline-flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-semibold uppercase tracking-wider text-white bg-[#ff4a22] hover:bg-[#e03d1a] rounded-full shadow-md shadow-[#ff4a22]/20 hover:shadow-lg hover:shadow-[#ff4a22]/35 transition-all duration-300 hover:-translate-y-0.5"
+                          >
+                            <span>{t("projectDetail", "liveDemo", lang) || "Live Demo"}</span>
+                            <ArrowUpRight size={14} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                          </a>
+                        )}
+                        {project.repo && project.repo !== "#" && (
+                          <a
+                            href={project.repo}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group inline-flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:text-[#ff4a22] transition-colors"
+                          >
+                            <span>{t("projectDetail", "viewCode", lang) || "View Code"}</span>
+                            <ExternalLink size={13} className="transition-transform duration-300 group-hover:scale-110" />
+                          </a>
+                        )}
+                      </div>
+                    </section>
+                  </FadeIn>
+                )}
+              </div>
+            </div>
 
-            {/* 03. Showcase Gallery (1 Kolom Vertikal) */}
             {project.gallery && project.gallery.length > 0 && (
               <FadeIn>
-                <section className="space-y-6 pt-6 border-t border-zinc-200/60 dark:border-zinc-800/60">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
-                      Showcase Gallery
+                <section className="space-y-7 mb-24">
+                  <div className="flex items-end justify-between border-b border-zinc-200/70 dark:border-zinc-800/70 pb-4">
+                    <h2 className="text-sm font-mono uppercase tracking-widest text-[#ff4a22] font-semibold">
+                      {t("projectDetail", "galleryTag", lang) || "Showcase Gallery"}
                     </h2>
                     <span className="text-xs font-mono text-zinc-400">
-                      {project.gallery.length} Images
+                      {String(Math.min(project.gallery.length, 8)).padStart(2, "0")}{" "}
+                      {t("projectDetail", "imagesWord", lang) || "Images"}
                     </span>
                   </div>
-
-                  {/* Layout 1 Kolom Kebawah */}
-                  <div className="flex flex-col gap-8">
-                    {project.gallery.map((img, i) => (
-                      <div
+                  <div className="flex flex-col gap-8 md:gap-12">
+                    {project.gallery.slice(0, 8).map((imgUrl, i) => (
+                      <button
                         key={i}
-                        className="w-full aspect-video rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 shadow-md group"
+                        type="button"
+                        onClick={() =>
+                          openImageViewer({
+                            src: imgUrl,
+                            alt: `${project.title} showcase image ${i + 1}`,
+                          })
+                        }
+                        aria-label={
+                          lang === "en"
+                            ? `View project image ${i + 1}`
+                            : `Lihat gambar proyek ${i + 1}`
+                        }
+                        className="group block aspect-video w-full cursor-zoom-in overflow-hidden rounded-2xl text-left"
                       >
                         <img
-                          src={img}
-                          alt={`${project.title} showcase mockup ${i + 1}`}
+                          src={imgUrl}
+                          alt={`${project.title} showcase image ${i + 1}`}
+                          loading="lazy"
+                          onError={handleImageError}
                           className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform duration-500"
                         />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </section>
               </FadeIn>
             )}
-
-          </main>
-        </div>
+          </>
+        )}
 
         {/* Animated Divider */}
         <div className="h-px bg-zinc-200 dark:bg-zinc-800 mb-20 relative overflow-hidden">
@@ -210,7 +311,7 @@ const ProjectDetail = () => {
           />
         </div>
 
-        {/* 4. Rekomendasi Proyek Terkait */}
+        {/* Rekomendasi Proyek Terkait */}
         <section>
           <FadeIn className="mb-10">
             <h2 className="text-2xl md:text-3xl font-bold dark:text-white">
@@ -222,15 +323,17 @@ const ProjectDetail = () => {
               <FadeIn key={key} delay={idx * 0.1}>
                 <Link
                   to={`/projects/${key}`}
-                  className="group block rounded-2xl p-4 bg-white dark:bg-zinc-900/40 border border-zinc-200/80 dark:border-zinc-800/80 hover:border-[#ff4a22]/50 transition-all duration-300"
+                  className="group block transition-colors duration-300"
                 >
-                  <div className="aspect-[16/10] rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-900 mb-4 relative">
+                  <div className="relative mb-4 aspect-[16/10] overflow-hidden rounded-2xl">
                     <img
-                      src={p.image}
+                      src={p.image || "/images/placeholder.webp"}
                       alt={p.title}
+                      loading="lazy"
+                      onError={handleImageError}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
-                    <div className="absolute top-3 right-3 p-2 rounded-full bg-black/40 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-3 right-3 text-white opacity-0 group-hover:opacity-100 transition-opacity">
                       <ArrowUpRight className="w-4 h-4" />
                     </div>
                   </div>
@@ -246,7 +349,12 @@ const ProjectDetail = () => {
             ))}
           </div>
         </section>
-
+        <ProjectImageLightbox
+          key={selectedImage?.src || "closed"}
+          image={selectedImage}
+          lang={lang}
+          onClose={closeImageViewer}
+        />
       </div>
     </section>
   );
