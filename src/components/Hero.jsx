@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { FadeIn } from "./FadeIn";
-import { useLanguage, t } from "../context/LanguageContext";
+import { useLanguage } from "../context/LanguageContext";
+import { siteData } from "../data/siteData";
 
 export const Hero = () => {
   const { lang } = useLanguage();
+  const hero = siteData.hero[lang];
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -24,14 +26,14 @@ export const Hero = () => {
             <FadeIn>
               <div className="flex gap-12 text-sm font-medium text-zinc-800 dark:text-[#ff4a22]">
                 <div>
-                  <p>+ {t('hero', 'desc')}</p>
+                  <p>+ {hero.desc}</p>
                 </div>
               </div>
             </FadeIn>
 
             <FadeIn delay={0.1}>
               <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[1.05] dark:text-[#faf9f6]">
-                {t('hero', 'title')}
+                {hero.title}
               </h1>
             </FadeIn>
 
@@ -39,14 +41,10 @@ export const Hero = () => {
               delay={0.2}
               className="flex flex-col sm:flex-row sm:items-end justify-between border-t border-black/10 dark:border-white/10 pt-8 mt-16"
             >
-              <div className="text-sm font-medium mb-6 sm:mb-0 dark:text-zinc-300">
-                <p className="text-zinc-500 dark:text-zinc-400 italic">
-                  Software Engineer &
-                </p>
-                <p className="font-bold">{t('hero', 'subtitle')}</p>
-              </div>
-              <p className="text-xl md:text-2xl font-light italic text-zinc-600 dark:text-zinc-400 max-w-lg leading-relaxed">
-                {lang === 'en' ? 'Applied Bachelor of Computer Science graduate with 2+ years of experience in building integrated web platforms using Laravel, React.js, and Express.js.' : 'Lulusan Sarjana Terapan Ilmu Komputer dengan pengalaman 2+ tahun dalam membangun platform web terintegrasi menggunakan Laravel, React.js, dan Express.js.'}
+              <p className="text-xl ml-10 md:text-2xl font-light italic text-zinc-600 dark:text-zinc-400 max-w-lg leading-relaxed">
+                {lang === 'en'
+                  ? 'Applied Bachelor of Computer Science graduate with 2+ years of experience in building integrated web platforms using Laravel, React.js, and Express.js.'
+                  : 'Lulusan Sarjana Terapan Ilmu Komputer dengan pengalaman 2+ tahun dalam membangun platform web terintegrasi menggunakan Laravel, React.js, dan Express.js.'}
               </p>
             </FadeIn>
           </div>
@@ -58,7 +56,7 @@ export const Hero = () => {
               className="relative aspect-4/5 overflow-hidden bg-[#faf9f6] dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 z-10 group"
             >
               <img
-                src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=1000&auto=format&fit=crop"
+                src={siteData.hero.image}
                 alt="Alfian Zainul Arif Portrait"
                 className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500"
               />

@@ -4,7 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { MainLayout } from './layouts/MainLayout';
 import { Projects } from './pages/Projects';
-import { ProjectDetail } from './pages/ProjectDetail';
+import ProjectDetail from './pages/ProjectDetail';
 import { About } from './pages/About';
 import { Contact } from './pages/Contact';
 

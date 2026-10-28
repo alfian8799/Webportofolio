@@ -2,94 +2,11 @@ import { useMemo, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { FadeIn } from "./FadeIn";
+import { projectsData } from "../data/projectsData";
 
-const projects = [
-  {
-    title: "VinzCV",
-    category: "Web App",
-    stack: ["React", "Express.js", "MongoDB"],
-    role: "Full-Stack Developer",
-    year: "2026",
-    status: "Production",
-    image:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=1000&auto=format&fit=crop",
-    desc: "Platform pembuat CV (resume builder) dengan live preview real-time, ekspor PDF, dan dashboard interaktif untuk mengelola riwayat karir.",
-    features: ["Real-time preview", "PDF export", "Auth & dashboard"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-  {
-    title: "Vinz Movie",
-    category: "Front-End",
-    stack: ["React", "Vite", "TMDB API"],
-    role: "Front-End Developer",
-    year: "2026",
-    status: "Live",
-    image:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop",
-    desc: "Aplikasi katalog film & serial TV responsif dengan integrasi REST API real-time untuk pencarian, detail, dan daftar favorit.",
-    features: ["Search & filter", "Dark mode", "Responsive UI"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-  {
-    title: "VianKasir POS",
-    category: "Web App",
-    stack: ["Laravel", "Filament", "MySQL"],
-    role: "Full-Stack Developer",
-    year: "2026",
-    status: "Production",
-    image:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1000&auto=format&fit=crop",
-    desc: "Sistem point of sale dan manajemen inventaris modern dengan dashboard analitik, manajemen stok, dan laporan penjualan detail.",
-    features: ["POS & transaksi", "Manajemen stok", "Analitik laporan"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-  {
-    title: "Game Dev Quest Board",
-    category: "Front-End",
-    stack: ["HTML5", "CSS", "JavaScript"],
-    role: "Full Development",
-    year: "2026",
-    status: "Open Source",
-    image:
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
-    desc: "Papan Kanban interaktif untuk memantau pipeline produksi game dengan progress bar bergamifikasi dan drag-and-drop task.",
-    features: ["Kanban board", "Gamified progress", "Drag & drop"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-  {
-    title: "Portfolio Platform",
-    category: "Web App",
-    stack: ["React", "Vite", "Framer Motion"],
-    role: "Front-End Developer",
-    year: "2026",
-    status: "Live",
-    image:
-      "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1000&auto=format&fit=crop",
-    desc: "Website portofolio modern dengan animasi scroll, tema gelap/terang, dan layout editorial bertema Swiss grid.",
-    features: ["Dark/light theme", "Scroll animation", "SEO friendly"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-  {
-    title: "API Auth Service",
-    category: "Backend",
-    stack: ["Express.js", "JWT", "MongoDB"],
-    role: "Backend Developer",
-    year: "2025",
-    status: "Production",
-    image:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1000&auto=format&fit=crop",
-    desc: "Layanan autentikasi RESTful dengan JWT, refresh token, rate limiting, dan proteksi endpoint berbasis role.",
-    features: ["JWT + refresh", "Rate limiting", "Role-based access"],
-    repo: "https://github.com",
-    demo: "#",
-  },
-];
+const projects = Object.values(projectsData);
 
 const filters = ["All", "Web App", "Front-End", "Backend"];
 
@@ -163,6 +80,7 @@ export const AllProjects = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {visible.map((project, idx) => (
           <FadeIn key={project.title} delay={idx * 0.08} variant="slide">
+            <Link to={project.slug ? `/projects/${project.slug}` : '#'} className="block">
             <motion.article
               whileHover={{ y: -8 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
@@ -221,6 +139,7 @@ export const AllProjects = () => {
                 </div>
               </div>
             </motion.article>
+            </Link>
           </FadeIn>
         ))}
       </div>

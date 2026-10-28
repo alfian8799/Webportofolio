@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FadeIn } from './FadeIn';
+import { projectsData } from '../data/projectsData';
 
 export const FeaturedProjects = () => {
   const sectionRef = useRef(null);
@@ -15,60 +16,12 @@ export const FeaturedProjects = () => {
   const scaleImage = useTransform(scrollYProgress, [0.1, 0.5], [1.15, 1]);
 
   const featuredProjects = [
-    { 
-      title: "VinzCV", 
-      category: "React.js • Express.js • MongoDB", 
-      role: "Full-Stack Developer",
-      year: "2026", 
-      image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=1000&auto=format&fit=crop",
-      desc: "Built a resume builder web platform featuring real-time preview, PDF export, and interactive dashboard.",
-      tags: ["React", "Node.js", "MongoDB"]
-    },
-    { 
-      title: "Vinz Movie", 
-      category: "React.js • Vite • TMDB API", 
-      role: "Front-End Developer",
-      year: "2026", 
-      image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1000&auto=format&fit=crop",
-      desc: "Responsive movie database web application with real-time REST API integration for searching movies and TV shows.",
-      tags: ["React", "Vite", "REST API"]
-    },
-    { 
-      title: "VianKasir POS", 
-      category: "Laravel • Filament PHP • MySQL", 
-      role: "Full-Stack Developer",
-      year: "2026", 
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1000&auto=format&fit=crop",
-      desc: "Modern point of sale and inventory management dashboard featuring detailed analytics widgets.",
-      tags: ["Laravel", "Filament", "MySQL"]
-    },
-    { 
-      title: "Game Dev Quest Board", 
-      category: "HTML5 • CSS • JavaScript", 
-      role: "Full Development",
-      year: "2026", 
-      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
-      desc: "Interactive Kanban board application to track game production pipelines with a real-time gamified progress bar.",
-      tags: ["HTML5", "CSS", "JavaScript"]
-    },
-    { 
-      title: "Portfolio Platform", 
-      category: "React • Vite • Tailwind", 
-      role: "Front-End Developer",
-      year: "2026", 
-      image: "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1000&auto=format&fit=crop",
-      desc: "Modern personal portfolio website featuring smooth scroll animations, dark mode, and responsive Swiss grid design.",
-      tags: ["React", "Tailwind", "Framer Motion"]
-    },
-    { 
-      title: "API Auth Service", 
-      category: "Express.js • JWT • MongoDB", 
-      role: "Backend Developer",
-      year: "2025", 
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1000&auto=format&fit=crop",
-      desc: "Robust RESTful authentication service with secure JWT handling, refresh tokens, and role-based access control.",
-      tags: ["Node.js", "JWT", "MongoDB"]
-    }
+    projectsData.vinzcv,
+    projectsData.vinzmovie,
+    projectsData.viankasir,
+    projectsData.gamedev,
+    projectsData.portfolio,
+    projectsData.apiauth,
   ];
 
   return (
@@ -96,6 +49,7 @@ export const FeaturedProjects = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 md:gap-14 mb-20">
         {featuredProjects.map((project, idx) => (
           <FadeIn key={idx} delay={idx * 0.08} variant={idx % 2 === 0 ? 'fade' : 'slideRight'}>
+            <Link to={project.slug ? `/projects/${project.slug}` : '#'} className="block">
             <motion.div 
               whileHover={{ y: -8 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
@@ -136,6 +90,7 @@ export const FeaturedProjects = () => {
                 </div>
               </div>
             </motion.div>
+            </Link>
           </FadeIn>
         ))}
       </div>
